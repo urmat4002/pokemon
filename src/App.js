@@ -2,46 +2,50 @@ import logo from './logo.svg'
 import './App.css'
 import {useState} from 'react'
 import {useEffect} from 'react'
-import {Card, Image} from 'react-bootstrap'
+import {Button, Card, Image, Pagination} from 'react-bootstrap'
+import {Cards} from './components/Cards'
 
 function App() {
-  const [data, setData] = useState([])
-  useEffect(() => {
-    fetch('https://pokeapi.co/api/v2/pokemon/ ')
+  const [data1, setData] = useState([])
+  const [next, setNext] = useState('')
+  const [previos, setPrevios] = useState('')
+
+  const fetchData = (url) => {
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.results)
+        console.log(data.next)
         setData(data.results)
+        setNext(data.next)
+        setPrevios(data.previous)
       })
+  }
+  useEffect(() => {
+    fetchData('https://pokeapi.co/api/v2/pokemon/')
   }, [])
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        background: '#FFFFE0',
-        flexWrap: 'wrap',
-      }}
-    >
-      {data &&
-        data.map((item, index) => (
-          <Card
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              background: '#00FFFF',
-              width: '200px',
-              borderRadius: '5px',
-              border: '1px solid black',
-              margin: '5px',
-            }}
-          >
-            <Image src={item.url} />
-            <Card.Text>{item.name}</Card.Text>
-          </Card>
-        ))}
-    </div>
+    <>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          background: '#FFFFE0',
+          flexWrap: 'wrap',
+        }}
+      >
+        {data1 &&
+          data1.map((item, index) => <Cards key={index} url={item.url} />)}
+      </div>
+
+      <Pagination className="d-flex justify-content-center">
+        <Pagination.First
+          disabled={!previos}
+          onClick={() => fetchData(previos)}
+        />
+        <Pagination.Last disabled={!next} onClick={() => fetchData(next)} />
+      </Pagination>
+    </>
   )
 }
 
